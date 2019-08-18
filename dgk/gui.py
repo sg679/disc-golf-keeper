@@ -112,7 +112,7 @@ class Gui(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
-        self.title('Disc Golf Keeper')
+        self.title('Disc Golfer Keeper')
         self['background'] = 'gray91'
         self['bd'] = 1
         self['relief'] = tk.GROOVE
