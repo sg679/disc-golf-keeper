@@ -72,13 +72,14 @@ class TreeView(ttk.Treeview):
 
     def __init__(self, master, database):
         ttk.Treeview.__init__(self, master)
-        xsb = ttk.Scrollbar(orient=tk.HORIZONTAL, command=self.xview)
-        ysb = ttk.Scrollbar(orient=tk.VERTICAL, command=self.yview)
+        xsb = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.xview)
+        ysb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.yview)
+        # ysb.pack(fill=tk.BOTH, expand=1, anchor=tk.E)
         self.configure(xscroll=xsb.set)
         self.configure(yscroll=ysb.set)
+        self['show'] = 'headings'
         self['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
                            '13', '14', '15', '16', '17', '18', '19', '20', '21', '22')
-        self.column('#0', width=DEFAULT_HEAD_WIDTH_2, stretch=tk.NO, anchor=tk.CENTER)
         for _ in self['columns']:
             if _ in '1':
                 width = DEFAULT_HEAD_WIDTH_3
@@ -87,7 +88,6 @@ class TreeView(ttk.Treeview):
             else:
                 width = DEFAULT_HEAD_WIDTH_1
             self.column(_, width=width, stretch=tk.NO, anchor=tk.CENTER)
-        self.heading('#0', text='Hole')
         for _ in self['columns']:
             if _ == '1':
                 text = 'Course'
@@ -114,14 +114,14 @@ class TreeView(ttk.Treeview):
         for row in cursor.fetchall():
             self.insert('', 'end', values=row)
         connect.close()
-        self.grid(row=5, column=0, columnspan=10)
+        self.pack(fill=tk.BOTH, expand=1)
 
 
 class Gui(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
-        self.title('Disc Golfer Keeper')
+        self.title('Disc Golfer Keeper - mtaylor79')
         self['background'] = 'gray91'
         self['bd'] = 1
         self['relief'] = tk.GROOVE
