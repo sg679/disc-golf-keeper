@@ -1,9 +1,9 @@
 __author__ = 'Marcus T Taylor'
 
 
+from tkinter import ttk
 import sqlite3 as db
 import tkinter as tk
-from tkinter import ttk
 
 
 DEFAULT_LABEL_WIDTH = 7
