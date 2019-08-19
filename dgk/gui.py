@@ -98,7 +98,11 @@ class TreeView(ttk.Treeview):
             elif _ == '22':
                 text = 'Total'
             else:
-                text = _
+                header = int(_)
+                if header > 10:
+                    text = header - 2
+                else:
+                    text = header - 1
             self.heading(_, text=text)
         connect = db.connect(database)
         cursor = connect.cursor()
