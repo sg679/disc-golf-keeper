@@ -72,11 +72,9 @@ class TreeView(ttk.Treeview):
 
     def __init__(self, master, database):
         ttk.Treeview.__init__(self, master)
-        xsb = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.xview)
-        ysb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.yview)
-        # ysb.pack(fill=tk.BOTH, expand=1, anchor=tk.E)
-        self.configure(xscroll=xsb.set)
+        ysb = ttk.Scrollbar(master, orient=tk.VERTICAL, command=self.yview)
         self.configure(yscroll=ysb.set)
+        ysb.grid(row=0, column=1, sticky=tk.NE + tk.SE)
         self['show'] = 'headings'
         self['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
                            '13', '14', '15', '16', '17', '18', '19', '20', '21', '22')
@@ -114,7 +112,7 @@ class TreeView(ttk.Treeview):
         for row in cursor.fetchall():
             self.insert('', 'end', values=row)
         connect.close()
-        self.pack(fill=tk.BOTH, expand=1)
+        self.grid(row=0, column=0)
 
 
 class Gui(tk.Tk):
