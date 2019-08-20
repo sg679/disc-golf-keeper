@@ -128,7 +128,6 @@ class ScorecardTable(ttk.Frame):
                 self.score_card.insert('', 'end', values=row)
         finally:
             connect.close()
-            print('load')
             self.score_card.after(60000, self.load)
 
 
