@@ -8,7 +8,6 @@ DEFAULT_LABEL_WIDTH = 7
 DEFAULT_HEAD_WIDTH_1 = 35
 DEFAULT_HEAD_WIDTH_2 = 55
 DEFAULT_HEAD_WIDTH_3 = 120
-TIMEOUT_DATA_RELOAD = 60000
 
 
 class ButtonSave(ttk.Button):
@@ -130,7 +129,7 @@ class ScorecardTable(ttk.Frame):
         finally:
             connect.close()
             print('load')
-            self.score_card.after(TIMEOUT_DATA_RELOAD, self.load)
+            self.score_card.after(60000, self.load)
 
 
 class Gui(tk.Tk):
