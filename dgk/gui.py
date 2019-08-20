@@ -1,15 +1,14 @@
 __author__ = 'Marcus T Taylor'
 
-
 from tkinter import ttk
 import sqlite3 as db
 import tkinter as tk
-
 
 DEFAULT_LABEL_WIDTH = 7
 DEFAULT_HEAD_WIDTH_1 = 35
 DEFAULT_HEAD_WIDTH_2 = 55
 DEFAULT_HEAD_WIDTH_3 = 120
+TIMEOUT_DATA_RELOAD = 60000
 
 
 class ButtonSave(ttk.Button):
@@ -68,25 +67,28 @@ class LabelText(ttk.Label):
         self.grid(row=index[0], column=index[1], pady=10)
 
 
-class TreeView(ttk.Treeview):
+class ScorecardTable(ttk.Frame):
 
     def __init__(self, master, database):
-        ttk.Treeview.__init__(self, master)
-        ysb = ttk.Scrollbar(master, orient=tk.VERTICAL, command=self.yview)
-        self.configure(yscroll=ysb.set)
+        self.database = database
+        ttk.Frame.__init__(self, master)
+        self.grid(row=3, column=0, padx=10, pady=10)
+        self.score_card = ttk.Treeview(self)
+        ysb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.score_card.yview)
+        self.score_card.configure(yscroll=ysb.set)
         ysb.grid(row=0, column=1, sticky=tk.NE + tk.SE)
-        self['show'] = 'headings'
-        self['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-                           '13', '14', '15', '16', '17', '18', '19', '20', '21', '22')
-        for _ in self['columns']:
+        self.score_card['show'] = 'headings'
+        self.score_card['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+                                      '13', '14', '15', '16', '17', '18', '19', '20', '21', '22')
+        for _ in self.score_card['columns']:
             if _ in '1':
                 width = DEFAULT_HEAD_WIDTH_3
             elif _ in ('11', '21', '22'):
                 width = DEFAULT_HEAD_WIDTH_2
             else:
                 width = DEFAULT_HEAD_WIDTH_1
-            self.column(_, width=width, stretch=tk.NO, anchor=tk.CENTER)
-        for _ in self['columns']:
+            self.score_card.column(_, width=width, stretch=tk.NO, anchor=tk.CENTER)
+        for _ in self.score_card['columns']:
             if _ == '1':
                 text = 'Course'
             elif _ == '11':
@@ -101,18 +103,34 @@ class TreeView(ttk.Treeview):
                     text = header - 2
                 else:
                     text = header - 1
-            self.heading(_, text=text)
-        connect = db.connect(database)
+            self.score_card.heading(_, text=text)
+        self.score_card.grid(row=0, column=0)
+        self.score_card.after(1000, self.load)
+
+    def load(self):
+        children = self.score_card.get_children()
+        if children:
+            for _ in children:
+                self.score_card.delete(_)
+        connect = db.connect(self.database)
         cursor = connect.cursor()
-        cursor.execute('SELECT course, hole01, hole02, hole03, hole04, hole05, '
-                       'hole06, hole07, hole08, hole09, front, hole10, '
-                       'hole11, hole12, hole13, hole14, hole15, hole16, '
-                       'hole17, hole18, back, total FROM game_stats '
-                       'ORDER BY GID DESC')
-        for row in cursor.fetchall():
-            self.insert('', 'end', values=row)
-        connect.close()
-        self.grid(row=0, column=0)
+        try:
+            cursor.execute('SELECT course, hole01, hole02, hole03, hole04, hole05, '
+                           'hole06, hole07, hole08, hole09, front, hole10, '
+                           'hole11, hole12, hole13, hole14, hole15, hole16, '
+                           'hole17, hole18, back, total FROM game_stats '
+                           'ORDER BY GID DESC')
+        except db.OperationalError as OPErr:
+            print(OPErr)
+        except db.ProgrammingError as PROErr:
+            print(PROErr)
+        else:
+            for row in cursor.fetchall():
+                self.score_card.insert('', 'end', values=row)
+        finally:
+            connect.close()
+            print('load')
+            self.score_card.after(TIMEOUT_DATA_RELOAD, self.load)
 
 
 class Gui(tk.Tk):
@@ -178,8 +196,7 @@ class Gui(tk.Tk):
         ButtonTotal(buttons, self.total_score)
         ButtonSave(buttons, self.save_game)
         # Scorecard Frame
-        scorecard = FrameRow(self, 3)
-        self.scorecard = TreeView(scorecard, self.database)
+        ScorecardTable(self, self.database)
 
     def save_game(self):
         connect = db.connect(self.database)
@@ -190,57 +207,38 @@ class Gui(tk.Tk):
               'hole10, hole11, hole12, hole13, hole14, ' \
               'hole15, hole16, hole17, hole18, back, total) ' \
               'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-        scores = [self.hole1.get(),
-                  self.hole2.get(),
-                  self.hole3.get(),
-                  self.hole4.get(),
-                  self.hole5.get(),
-                  self.hole6.get(),
-                  self.hole7.get(),
-                  self.hole8.get(),
-                  self.hole9.get(),
-                  self.total_front(),
-                  self.hole10.get(),
-                  self.hole11.get(),
-                  self.hole12.get(),
-                  self.hole13.get(),
-                  self.hole14.get(),
-                  self.hole15.get(),
-                  self.hole16.get(),
-                  self.hole17.get(),
-                  self.hole18.get(),
-                  self.total_back(),
+        scores = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
+                  self.hole4.get(), self.hole5.get(), self.hole6.get(),
+                  self.hole7.get(), self.hole8.get(), self.hole9.get(),
+                  self.total_front(), self.hole10.get(), self.hole11.get(),
+                  self.hole12.get(), self.hole13.get(), self.hole14.get(),
+                  self.hole15.get(), self.hole16.get(), self.hole17.get(),
+                  self.hole18.get(), self.total_back(),
                   self.total_front() + self.total_back()]
         scores = [int(x) for x in scores]
         scores.insert(0, self.course.get())
-        cursor.execute(sql, tuple(scores))
-        connect.commit()
-        connect.close()
-        self.scorecard.insert('', 0, values=scores)
+        try:
+            cursor.execute(sql, tuple(scores))
+        except db.OperationalError as OPErr:
+            print(OPErr)
+        except db.ProgrammingError as PROErr:
+            print(PROErr)
+        else:
+            connect.commit()
+        finally:
+            connect.close()
 
     def total_back(self):
-        row = [self.hole10.get(),
-               self.hole11.get(),
-               self.hole12.get(),
-               self.hole13.get(),
-               self.hole14.get(),
-               self.hole15.get(),
-               self.hole16.get(),
-               self.hole17.get(),
-               self.hole18.get()]
+        row = [self.hole10.get(), self.hole11.get(), self.hole12.get(),
+               self.hole13.get(), self.hole14.get(), self.hole15.get(),
+               self.hole16.get(), self.hole17.get(), self.hole18.get()]
         row = [int(x) for x in row]
         return sum(row)
 
     def total_front(self):
-        row = [self.hole1.get(),
-               self.hole2.get(),
-               self.hole3.get(),
-               self.hole4.get(),
-               self.hole5.get(),
-               self.hole6.get(),
-               self.hole7.get(),
-               self.hole8.get(),
-               self.hole9.get()]
+        row = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
+               self.hole4.get(), self.hole5.get(), self.hole6.get(),
+               self.hole7.get(), self.hole8.get(), self.hole9.get()]
         row = [int(x) for x in row]
         return sum(row)
 
