@@ -1,4 +1,6 @@
 __author__ = 'Marcus T Taylor'
+__version__ = '0.1'
+
 
 from tkinter import ttk
 import sqlite3 as db
