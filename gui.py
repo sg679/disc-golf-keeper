@@ -130,7 +130,7 @@ class ScorecardTable(ttk.Frame):
                 self.score_card.insert('', 'end', values=row)
         finally:
             connect.close()
-            self.score_card.after(60000, self.load)
+            self.score_card.after(300000, self.load)
 
 
 class Gui(tk.Tk):
