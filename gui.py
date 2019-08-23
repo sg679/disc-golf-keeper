@@ -153,7 +153,10 @@ class Gui(tk.Tk):
         data = FrameRow(self, 0)
         LabelText(data, (0, 0), 'Course', 10)
         parks = ['Mary Rutan Park', 'Mill Valley Park']
-        self.course = ttk.Combobox(data, values=parks)
+        self.course = ttk.Combobox(data)
+        self.course['height'] = 4
+        self.course['justify'] = 'center'
+        self.course['values'] = parks
         self.course.set(parks[0])
         self.course.grid(row=0, column=1)
         holes = FrameRow(self, 1)
@@ -162,6 +165,7 @@ class Gui(tk.Tk):
             label = f'Hole {hole}'
             LabelText(holes, (0, index), label, DEFAULT_LABEL_WIDTH)
         LabelText(holes, (0, 9), 'Front', DEFAULT_LABEL_WIDTH)
+        LabelText(holes, (0, 10), 'Total', 14)
         self.hole1 = EntryThrows(holes, (1, 0))
         self.hole2 = EntryThrows(holes, (1, 1))
         self.hole3 = EntryThrows(holes, (1, 2))
@@ -172,6 +176,12 @@ class Gui(tk.Tk):
         self.hole8 = EntryThrows(holes, (1, 7))
         self.hole9 = EntryThrows(holes, (1, 8))
         self.front = EntryTotal(holes, (1, 9))
+        self.total = ttk.Entry(holes)
+        self.total['font'] = ('Arial', 74)
+        self.total['justify'] = 'center'
+        self.total['state'] = tk.DISABLED
+        self.total['width'] = 3
+        self.total.grid(row=1, column=10, rowspan=3)
         for index in range(10, 19):
             hole = index
             label = f'Hole {hole}'
@@ -189,7 +199,7 @@ class Gui(tk.Tk):
         self.back = EntryTotal(holes, (3, 9))
         # Button Frame
         buttons = FrameRow(self, 2)
-        ButtonTotal(buttons, self.total_score)
+        ButtonTotal(buttons, self.update_score)
         ButtonSave(buttons, self.save_game)
         # Scorecard Frame
         ScorecardTable(self, self.database)
@@ -239,9 +249,12 @@ class Gui(tk.Tk):
         return sum(row)
 
     def total_score(self):
+        return self.total_front() + self.total_back()
+
+    def update_score(self):
         self.set_total(self.front, self.total_front())
         self.set_total(self.back, self.total_back())
-        return self.total_front() + self.total_back()
+        self.set_total(self.total, self.total_score())
 
     @staticmethod
     def set_total(master, value):
