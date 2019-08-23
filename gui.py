@@ -117,10 +117,10 @@ class ScorecardTable(ttk.Frame):
                            'hole11, hole12, hole13, hole14, hole15, hole16, '
                            'hole17, hole18, back, total FROM game_stats '
                            'ORDER BY GID DESC')
-        except db.OperationalError as OPErr:
-            print(OPErr)
-        except db.ProgrammingError as PROErr:
-            print(PROErr)
+        except db.OperationalError as OPError:
+            exit(OPError)
+        except db.ProgrammingError as PROError:
+            exit(PROError)
         else:
             for row in cursor.fetchall():
                 self.score_card.insert('', 'end', values=row)
