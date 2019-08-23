@@ -234,6 +234,13 @@ class Gui(tk.Tk):
         finally:
             connect.close()
 
+    @staticmethod
+    def set_total(master, value):
+        master.configure(state=tk.NORMAL)
+        master.delete(0, tk.END)
+        master.insert(tk.END, value)
+        master.configure(state=tk.DISABLED)
+
     def total_back(self):
         row = [self.hole10.get(), self.hole11.get(), self.hole12.get(),
                self.hole13.get(), self.hole14.get(), self.hole15.get(),
@@ -255,13 +262,6 @@ class Gui(tk.Tk):
         self.set_total(self.front, self.total_front())
         self.set_total(self.back, self.total_back())
         self.set_total(self.total, self.total_score())
-
-    @staticmethod
-    def set_total(master, value):
-        master.configure(state=tk.NORMAL)
-        master.delete(0, tk.END)
-        master.insert(tk.END, value)
-        master.configure(state=tk.DISABLED)
 
 
 if __name__ == '__main__':
