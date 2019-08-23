@@ -102,9 +102,9 @@ class ScorecardTable(ttk.Frame):
                     text = header - 1
             self.score_card.heading(_, text=text)
         self.score_card.grid(row=0, column=0)
-        self.score_card.after(1000, self.load)
+        self.score_card.after(1000, self._load)
 
-    def load(self):
+    def _load(self):
         children = self.score_card.get_children()
         if children:
             for _ in children:
@@ -126,7 +126,7 @@ class ScorecardTable(ttk.Frame):
                 self.score_card.insert('', 'end', values=row)
         finally:
             connect.close()
-            self.score_card.after(300000, self.load)
+            self.score_card.after(300000, self._load)
 
 
 class Gui(tk.Tk):
