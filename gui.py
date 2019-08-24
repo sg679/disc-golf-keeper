@@ -16,32 +16,37 @@ class ButtonSave(ttk.Button):
         ttk.Button.__init__(self, master)
         self['command'] = command
         self['text'] = 'Save'
-        self.grid(row=0, column=1)
-
-
-class ButtonTotal(ttk.Button):
-
-    def __init__(self, master, command):
-        ttk.Button.__init__(self, master)
-        self['command'] = command
-        self['text'] = 'Total'
         self.grid(row=0, column=0)
 
 
 class EntryThrows(ttk.Entry):
 
-    def __init__(self, master, index):
+    def __init__(self, master, index, callback):
         ttk.Entry.__init__(self, master)
+        self['font'] = ('Arial', 18)
         self['justify'] = 'center'
         self['width'] = 2
         self.insert(tk.END, 0)
+        self.bind('<FocusOut>', callback)
         self.grid(row=index[0], column=index[1])
 
 
-class EntryTotal(ttk.Entry):
+class EntryTotalMain(ttk.Entry):
 
     def __init__(self, master, index):
         ttk.Entry.__init__(self, master)
+        self['font'] = ('Arial', 80)
+        self['justify'] = 'center'
+        self['state'] = tk.DISABLED
+        self['width'] = 3
+        self.grid(row=index[0], column=index[1], rowspan=3)
+
+
+class EntryTotalSub(ttk.Entry):
+
+    def __init__(self, master, index):
+        ttk.Entry.__init__(self, master)
+        self['font'] = ('Arial', 18)
         self['justify'] = 'center'
         self['state'] = tk.DISABLED
         self['width'] = 2
@@ -79,7 +84,7 @@ class ScorecardTable(ttk.Frame):
         self.score_card['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9',
                                       '10', '11', '12', '13', '14', '15', '16', '17',
                                       '18', '19', '20', '21', '22')
-        self.score_card['height'] = 12
+        self.score_card['height'] = 10
         self.score_card['selectmode'] = 'browse'
         self.score_card['show'] = 'headings'
         for _ in self.score_card['columns']:
@@ -171,40 +176,34 @@ class Gui(tk.Tk):
             LabelText(holes, (0, index), label, DEFAULT_LABEL_WIDTH)
         LabelText(holes, (0, 9), 'Front', DEFAULT_LABEL_WIDTH)
         LabelText(holes, (0, 10), 'Total', 14)
-        self.hole1 = EntryThrows(holes, (1, 0))
-        self.hole2 = EntryThrows(holes, (1, 1))
-        self.hole3 = EntryThrows(holes, (1, 2))
-        self.hole4 = EntryThrows(holes, (1, 3))
-        self.hole5 = EntryThrows(holes, (1, 4))
-        self.hole6 = EntryThrows(holes, (1, 5))
-        self.hole7 = EntryThrows(holes, (1, 6))
-        self.hole8 = EntryThrows(holes, (1, 7))
-        self.hole9 = EntryThrows(holes, (1, 8))
-        self.front = EntryTotal(holes, (1, 9))
-        self.total = ttk.Entry(holes)
-        self.total['font'] = ('Arial', 74)
-        self.total['justify'] = 'center'
-        self.total['state'] = tk.DISABLED
-        self.total['width'] = 3
-        self.total.grid(row=1, column=10, rowspan=3)
+        self.hole1 = EntryThrows(holes, (1, 0), self.update_score)
+        self.hole2 = EntryThrows(holes, (1, 1), self.update_score)
+        self.hole3 = EntryThrows(holes, (1, 2), self.update_score)
+        self.hole4 = EntryThrows(holes, (1, 3), self.update_score)
+        self.hole5 = EntryThrows(holes, (1, 4), self.update_score)
+        self.hole6 = EntryThrows(holes, (1, 5), self.update_score)
+        self.hole7 = EntryThrows(holes, (1, 6), self.update_score)
+        self.hole8 = EntryThrows(holes, (1, 7), self.update_score)
+        self.hole9 = EntryThrows(holes, (1, 8), self.update_score)
+        self.front = EntryTotalSub(holes, (1, 9))
+        self.total = EntryTotalMain(holes, (1, 10))
         for index in range(10, 19):
             hole = index
             label = f'Hole {hole}'
             LabelText(holes, (2, index - 10), label, DEFAULT_LABEL_WIDTH)
         LabelText(holes, (2, 9), 'Back', DEFAULT_LABEL_WIDTH)
-        self.hole10 = EntryThrows(holes, (3, 0))
-        self.hole11 = EntryThrows(holes, (3, 1))
-        self.hole12 = EntryThrows(holes, (3, 2))
-        self.hole13 = EntryThrows(holes, (3, 3))
-        self.hole14 = EntryThrows(holes, (3, 4))
-        self.hole15 = EntryThrows(holes, (3, 5))
-        self.hole16 = EntryThrows(holes, (3, 6))
-        self.hole17 = EntryThrows(holes, (3, 7))
-        self.hole18 = EntryThrows(holes, (3, 8))
-        self.back = EntryTotal(holes, (3, 9))
+        self.hole10 = EntryThrows(holes, (3, 0), self.update_score)
+        self.hole11 = EntryThrows(holes, (3, 1), self.update_score)
+        self.hole12 = EntryThrows(holes, (3, 2), self.update_score)
+        self.hole13 = EntryThrows(holes, (3, 3), self.update_score)
+        self.hole14 = EntryThrows(holes, (3, 4), self.update_score)
+        self.hole15 = EntryThrows(holes, (3, 5), self.update_score)
+        self.hole16 = EntryThrows(holes, (3, 6), self.update_score)
+        self.hole17 = EntryThrows(holes, (3, 7), self.update_score)
+        self.hole18 = EntryThrows(holes, (3, 8), self.update_score)
+        self.back = EntryTotalSub(holes, (3, 9))
         # Button Frame
         buttons = FrameRow(self, 2)
-        ButtonTotal(buttons, self.update_score)
         ButtonSave(buttons, self.save_game)
         # Scorecard Frame
         ScorecardTable(self, self.database)
@@ -246,26 +245,26 @@ class Gui(tk.Tk):
         master.insert(tk.END, value)
         master.configure(state=tk.DISABLED)
 
-    def total_back(self):
-        row = [self.hole10.get(), self.hole11.get(), self.hole12.get(),
-               self.hole13.get(), self.hole14.get(), self.hole15.get(),
-               self.hole16.get(), self.hole17.get(), self.hole18.get()]
-        row = [int(x) for x in row]
-        return sum(row)
-
-    def total_front(self):
-        row = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
-               self.hole4.get(), self.hole5.get(), self.hole6.get(),
-               self.hole7.get(), self.hole8.get(), self.hole9.get()]
-        row = [int(x) for x in row]
-        return sum(row)
-
     def total_score(self):
-        return self.total_front() + self.total_back()
+        return self.total_sub('back') + self.total_sub('front')
 
-    def update_score(self):
-        self.set_total(self.front, self.total_front())
-        self.set_total(self.back, self.total_back())
+    def total_sub(self, side):
+        row = []
+        if side == 'back':
+            row = [self.hole10.get(), self.hole11.get(), self.hole12.get(),
+                   self.hole13.get(), self.hole14.get(), self.hole15.get(),
+                   self.hole16.get(), self.hole17.get(), self.hole18.get()]
+        if side == 'front':
+            row = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
+                   self.hole4.get(), self.hole5.get(), self.hole6.get(),
+                   self.hole7.get(), self.hole8.get(), self.hole9.get()]
+        row = [int(x) for x in row]
+        return sum(row)
+
+    def update_score(self, event):
+        print(event)
+        self.set_total(self.front, self.total_sub('front'))
+        self.set_total(self.back, self.total_sub('back'))
         self.set_total(self.total, self.total_score())
 
 
