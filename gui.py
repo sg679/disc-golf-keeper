@@ -220,11 +220,10 @@ class Gui(tk.Tk):
         scores = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
                   self.hole4.get(), self.hole5.get(), self.hole6.get(),
                   self.hole7.get(), self.hole8.get(), self.hole9.get(),
-                  self.total_front(), self.hole10.get(), self.hole11.get(),
+                  self.total_sub('front'), self.hole10.get(), self.hole11.get(),
                   self.hole12.get(), self.hole13.get(), self.hole14.get(),
                   self.hole15.get(), self.hole16.get(), self.hole17.get(),
-                  self.hole18.get(), self.total_back(),
-                  self.total_front() + self.total_back()]
+                  self.hole18.get(), self.total_sub('back'), self.total_score()]
         scores = [int(x) for x in scores]
         scores.insert(0, self.course.get())
         try:
