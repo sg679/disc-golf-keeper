@@ -1,4 +1,6 @@
 from tkinter import ttk
+import getpass as gp
+import os
 import sqlite3 as db
 import tkinter as tk
 
@@ -74,9 +76,12 @@ class ScorecardTable(ttk.Frame):
         ysb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.score_card.yview)
         self.score_card.configure(yscroll=ysb.set)
         ysb.grid(row=0, column=1, sticky=tk.NE + tk.SE)
+        self.score_card['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9',
+                                      '10', '11', '12', '13', '14', '15', '16', '17',
+                                      '18', '19', '20', '21', '22')
+        self.score_card['height'] = 12
+        self.score_card['selectmode'] = 'browse'
         self.score_card['show'] = 'headings'
-        self.score_card['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-                                      '13', '14', '15', '16', '17', '18', '19', '20', '21', '22')
         for _ in self.score_card['columns']:
             if _ in '1':
                 width = DEFAULT_HEAD_WIDTH_3
@@ -132,15 +137,7 @@ class ScorecardTable(ttk.Frame):
 class Gui(tk.Tk):
 
     def __init__(self):
-        tk.Tk.__init__(self)
-        import getpass
-        self.title(f'Disc Golfer Keeper - {getpass.getuser()}')
-        self['background'] = 'gray91'
-        self['bd'] = 1
-        self['relief'] = tk.GROOVE
-        self['takefocus'] = True
         # Database checking.
-        import os
         data_dir = os.path.abspath(__file__)
         database = data_dir.replace(os.path.basename(__file__), 'database/dgk.sqlite')
         try:
@@ -150,6 +147,13 @@ class Gui(tk.Tk):
                 self.database = database
         except FileNotFoundError:
             exit('Database file not found! Exiting...')
+        # Create application window
+        tk.Tk.__init__(self)
+        self.title(f'Disc Golfer Keeper - {gp.getuser()}')
+        self['background'] = 'gray91'
+        self['bd'] = 1
+        self['relief'] = tk.GROOVE
+        self['takefocus'] = True
         # Holes Frame
         data = FrameRow(self, 0)
         LabelText(data, (0, 0), 'Course', 10)
