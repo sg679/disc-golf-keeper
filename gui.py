@@ -241,7 +241,7 @@ class LabelText(ttk.Label):
         self.grid(row=index[0], column=index[1])
 
 
-class Gui(tk.Tk):
+class CreateGui(tk.Tk):
 
     def __init__(self):
         # Database checking.
@@ -268,4 +268,4 @@ class Gui(tk.Tk):
 
 
 if __name__ == '__main__':
-    Gui().mainloop()
+    CreateGui().mainloop()
