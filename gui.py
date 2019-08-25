@@ -7,9 +7,9 @@ import tkinter as tk
 DEFAULT_FONT_ENTRY = ('Helvetica', 13)
 DEFAULT_FONT_LABEL = ('Helvetica', 12)
 DEFAULT_LABEL_WIDTH = 7
-DEFAULT_HEAD_WIDTH_1 = 35
-DEFAULT_HEAD_WIDTH_2 = 55
-DEFAULT_HEAD_WIDTH_3 = 120
+DEFAULT_TV_WIDTH_1 = 35
+DEFAULT_TV_WIDTH_2 = 55
+DEFAULT_TV_WIDTH_3 = 120
 
 
 class ButtonSave(ttk.Button):
@@ -107,11 +107,11 @@ class ScorecardTable(ttk.Frame):
         self.score_card['show'] = 'headings'
         for _ in self.score_card['columns']:
             if _ in '1':
-                width = DEFAULT_HEAD_WIDTH_3
+                width = DEFAULT_TV_WIDTH_3
             elif _ in ('11', '21', '22'):
-                width = DEFAULT_HEAD_WIDTH_2
+                width = DEFAULT_TV_WIDTH_2
             else:
-                width = DEFAULT_HEAD_WIDTH_1
+                width = DEFAULT_TV_WIDTH_1
             self.score_card.column(_, width=width, stretch=tk.NO, anchor=tk.CENTER)
         for _ in self.score_card['columns']:
             if _ == '1':
