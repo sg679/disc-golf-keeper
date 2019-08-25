@@ -4,6 +4,8 @@ import os
 import sqlite3 as db
 import tkinter as tk
 
+DEFAULT_FONT_ENTRY = ('Helvetica', 13)
+DEFAULT_FONT_LABEL = ('Helvetica', 12)
 DEFAULT_LABEL_WIDTH = 7
 DEFAULT_HEAD_WIDTH_1 = 35
 DEFAULT_HEAD_WIDTH_2 = 55
@@ -16,16 +18,31 @@ class ButtonSave(ttk.Button):
         ttk.Button.__init__(self, master)
         self['command'] = command
         self['text'] = 'Save'
+        self['width'] = 10
         self.grid(row=0, column=0)
+
+
+class ComboParks(ttk.Combobox):
+
+    def __init__(self, master):
+        parks = ['Mary Rutan Park', 'Mill Valley Park']
+        ttk.Combobox.__init__(self, master)
+        self['font'] = DEFAULT_FONT_ENTRY
+        self['height'] = 4
+        self['justify'] = 'center'
+        self['state'] = 'readonly'
+        self['values'] = parks
+        self.set(parks[0])
+        self.grid(row=0, column=1)
 
 
 class EntryThrows(ttk.Entry):
 
     def __init__(self, master, index, callback):
         ttk.Entry.__init__(self, master)
-        self['font'] = ('Arial', 18)
+        self['font'] = DEFAULT_FONT_ENTRY
         self['justify'] = 'center'
-        self['width'] = 2
+        self['width'] = 3
         self.insert(tk.END, 0)
         self.bind('<FocusOut>', callback)
         self.grid(row=index[0], column=index[1])
@@ -35,7 +52,7 @@ class EntryTotalMain(ttk.Entry):
 
     def __init__(self, master, index):
         ttk.Entry.__init__(self, master)
-        self['font'] = ('Arial', 80)
+        self['font'] = ('Helvetica', 80)
         self['justify'] = 'center'
         self['state'] = tk.DISABLED
         self['width'] = 3
@@ -46,10 +63,10 @@ class EntryTotalSub(ttk.Entry):
 
     def __init__(self, master, index):
         ttk.Entry.__init__(self, master)
-        self['font'] = ('Arial', 18)
+        self['font'] = DEFAULT_FONT_ENTRY
         self['justify'] = 'center'
         self['state'] = tk.DISABLED
-        self['width'] = 2
+        self['width'] = 3
         self.insert(tk.END, 0)
         self.grid(row=index[0], column=index[1])
 
@@ -66,6 +83,7 @@ class LabelText(ttk.Label):
     def __init__(self, master, index, text, width):
         ttk.Label.__init__(self, master)
         self['anchor'] = tk.CENTER
+        self['font'] = DEFAULT_FONT_LABEL
         self['text'] = text
         self['width'] = width
         self.grid(row=index[0], column=index[1], pady=10)
@@ -155,24 +173,20 @@ class Gui(tk.Tk):
         # Create application window
         tk.Tk.__init__(self)
         self.title(f'Disc Golfer Keeper - {gp.getuser()}')
+        self.resizable(False, False)
         self['background'] = 'gray91'
         self['bd'] = 1
         self['relief'] = tk.GROOVE
         self['takefocus'] = True
-        # Holes Frame
+        # Data Frame
         data = FrameRow(self, 0)
         LabelText(data, (0, 0), 'Course', 10)
-        parks = ['Mary Rutan Park', 'Mill Valley Park']
-        self.course = ttk.Combobox(data)
-        self.course['height'] = 4
-        self.course['justify'] = 'center'
-        self.course['values'] = parks
-        self.course.set(parks[0])
-        self.course.grid(row=0, column=1)
+        self.course = ComboParks(data)
+        # Holes Frame
         holes = FrameRow(self, 1)
         for index in range(0, 9):
             hole = index + 1
-            label = f'Hole {hole}'
+            label = f'{hole}'
             LabelText(holes, (0, index), label, DEFAULT_LABEL_WIDTH)
         LabelText(holes, (0, 9), 'Front', DEFAULT_LABEL_WIDTH)
         LabelText(holes, (0, 10), 'Total', 14)
@@ -189,7 +203,7 @@ class Gui(tk.Tk):
         self.total = EntryTotalMain(holes, (1, 10))
         for index in range(10, 19):
             hole = index
-            label = f'Hole {hole}'
+            label = f'{hole}'
             LabelText(holes, (2, index - 10), label, DEFAULT_LABEL_WIDTH)
         LabelText(holes, (2, 9), 'Back', DEFAULT_LABEL_WIDTH)
         self.hole10 = EntryThrows(holes, (3, 0), self.update_score)
@@ -207,6 +221,13 @@ class Gui(tk.Tk):
         ButtonSave(buttons, self.save_game)
         # Scorecard Frame
         ScorecardTable(self, self.database)
+        # Status bar
+        status_bar = FrameRow(self, 4)
+        sb = ttk.Label(status_bar, text='Status bar...')
+        sb['anchor'] = tk.W
+        sb['relief'] = tk.SUNKEN
+        sb['width'] = 103
+        sb.grid(row=4, column=0)
 
     def save_game(self):
         connect = db.connect(self.database)
