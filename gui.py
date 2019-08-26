@@ -33,15 +33,15 @@ class CreateGameForm(ttk.Frame):
             LabelText(self, (0, index), label, DEFAULT_LABEL_WIDTH)
         LabelText(self, (0, 9), 'Front', DEFAULT_LABEL_WIDTH)
         LabelText(self, (0, 10), 'Total', 14)
-        self.hole1 = EntryHole(self, (1, 0), self.update_score)
-        self.hole2 = EntryHole(self, (1, 1), self.update_score)
-        self.hole3 = EntryHole(self, (1, 2), self.update_score)
-        self.hole4 = EntryHole(self, (1, 3), self.update_score)
-        self.hole5 = EntryHole(self, (1, 4), self.update_score)
-        self.hole6 = EntryHole(self, (1, 5), self.update_score)
-        self.hole7 = EntryHole(self, (1, 6), self.update_score)
-        self.hole8 = EntryHole(self, (1, 7), self.update_score)
-        self.hole9 = EntryHole(self, (1, 8), self.update_score)
+        self.hole1 = EntryHole(self, (1, 0), self._update_entry)
+        self.hole2 = EntryHole(self, (1, 1), self._update_entry)
+        self.hole3 = EntryHole(self, (1, 2), self._update_entry)
+        self.hole4 = EntryHole(self, (1, 3), self._update_entry)
+        self.hole5 = EntryHole(self, (1, 4), self._update_entry)
+        self.hole6 = EntryHole(self, (1, 5), self._update_entry)
+        self.hole7 = EntryHole(self, (1, 6), self._update_entry)
+        self.hole8 = EntryHole(self, (1, 7), self._update_entry)
+        self.hole9 = EntryHole(self, (1, 8), self._update_entry)
         self.front = EntryTotalSub(self, (1, 9))
         self.total = EntryTotalMain(self, (1, 10))
         for index in range(10, 19):
@@ -49,19 +49,20 @@ class CreateGameForm(ttk.Frame):
             label = f'{hole}'
             LabelText(self, (2, index - 10), label, DEFAULT_LABEL_WIDTH)
         LabelText(self, (2, 9), 'Back', DEFAULT_LABEL_WIDTH)
-        self.hole10 = EntryHole(self, (3, 0), self.update_score)
-        self.hole11 = EntryHole(self, (3, 1), self.update_score)
-        self.hole12 = EntryHole(self, (3, 2), self.update_score)
-        self.hole13 = EntryHole(self, (3, 3), self.update_score)
-        self.hole14 = EntryHole(self, (3, 4), self.update_score)
-        self.hole15 = EntryHole(self, (3, 5), self.update_score)
-        self.hole16 = EntryHole(self, (3, 6), self.update_score)
-        self.hole17 = EntryHole(self, (3, 7), self.update_score)
-        self.hole18 = EntryHole(self, (3, 8), self.update_score)
+        self.hole10 = EntryHole(self, (3, 0), self._update_entry)
+        self.hole11 = EntryHole(self, (3, 1), self._update_entry)
+        self.hole12 = EntryHole(self, (3, 2), self._update_entry)
+        self.hole13 = EntryHole(self, (3, 3), self._update_entry)
+        self.hole14 = EntryHole(self, (3, 4), self._update_entry)
+        self.hole15 = EntryHole(self, (3, 5), self._update_entry)
+        self.hole16 = EntryHole(self, (3, 6), self._update_entry)
+        self.hole17 = EntryHole(self, (3, 7), self._update_entry)
+        self.hole18 = EntryHole(self, (3, 8), self._update_entry)
         self.back = EntryTotalSub(self, (3, 9))
-        ButtonSave(self, self.save_game)
+        ButtonSave(self, self._save_scores)
+        self.after(500, self._update_entry)
 
-    def save_game(self):
+    def _save_scores(self):
         connect = db.connect(self.database)
         cursor = connect.cursor()
         sql = 'INSERT INTO game_stats ' \
@@ -89,6 +90,12 @@ class CreateGameForm(ttk.Frame):
         finally:
             connect.close()
 
+    def _update_entry(self, event=None):
+        print(event)
+        self.set_total(self.front, self.total_sub('front'))
+        self.set_total(self.back, self.total_sub('back'))
+        self.set_total(self.total, self.total_score())
+
     @staticmethod
     def set_total(master, value):
         master.configure(state=tk.NORMAL)
@@ -111,12 +118,6 @@ class CreateGameForm(ttk.Frame):
                    self.hole7.get(), self.hole8.get(), self.hole9.get()]
         row = [int(x) for x in row]
         return sum(row)
-
-    def update_score(self, event):
-        print(event)
-        self.set_total(self.front, self.total_sub('front'))
-        self.set_total(self.back, self.total_sub('back'))
-        self.set_total(self.total, self.total_score())
 
 
 class CreateScorecard(ttk.Frame):
