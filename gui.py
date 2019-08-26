@@ -183,18 +183,6 @@ class CreateScorecard(ttk.Frame):
             self.score_card.after(300000, self._load)
 
 
-class CreateStatusBar(ttk.Frame):
-
-    def __init__(self, master):
-        ttk.Frame.__init__(self, master)
-        self.grid(row=2, column=0, padx=10, pady=10)
-        sb = ttk.Label(self, text='Status bar...')
-        sb['anchor'] = tk.W
-        sb['relief'] = tk.SUNKEN
-        sb['width'] = 90
-        sb.grid(row=4, column=0)
-
-
 class EntryHole(ttk.Entry):
 
     def __init__(self, master, index, callback):
@@ -264,7 +252,6 @@ class CreateGui(tk.Tk):
         self['takefocus'] = True
         CreateGameForm(self, self.database)
         CreateScorecard(self, self.database)
-        CreateStatusBar(self)
 
 
 if __name__ == '__main__':
