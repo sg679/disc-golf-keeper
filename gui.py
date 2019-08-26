@@ -80,10 +80,10 @@ class CreateGameForm(ttk.Frame):
         scores = [int(x) for x in scores]
         try:
             cursor.execute(sql, tuple(scores))
-        except db.OperationalError as OPErr:
-            print(OPErr)
-        except db.ProgrammingError as PROErr:
-            print(PROErr)
+        except db.OperationalError as OPError:
+            print(OPError)
+        except db.ProgrammingError as PROError:
+            print(PROError)
         else:
             connect.commit()
         finally:
