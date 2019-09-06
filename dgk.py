@@ -4,6 +4,10 @@ import os
 import sqlite3 as db
 import tkinter as tk
 
+__author__ = 'Marcus T Taylor'
+__email__ = 'taylormjm3121@gmail.com'
+__version__ = '0.1'
+
 DEFAULT_FONT_ENTRY = ('Helvetica', 13)
 DEFAULT_FONT_LABEL = ('Helvetica', 12)
 DEFAULT_LABEL_WIDTH = 7
