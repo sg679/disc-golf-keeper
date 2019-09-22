@@ -6,13 +6,14 @@ import tkinter as tk
 
 __author__ = 'Marcus T Taylor'
 __email__ = 'taylormjm3121@gmail.com'
-__version__ = '0.2'
+__version__ = '0.3'
 
 DEFAULT_FONT_ENTRY = ('Helvetica', 13)
 DEFAULT_FONT_LABEL = ('Helvetica', 12)
 DEFAULT_LABEL_WIDTH = 7
 DEFAULT_TV_WIDTH_1 = 35
 DEFAULT_TV_WIDTH_2 = 55
+DEFAULT_WIDGET_BACKGROUND = 'gray91'
 
 
 class ButtonSave(ttk.Button):
@@ -89,13 +90,14 @@ class CreateGameForm(ttk.Frame):
         try:
             cursor.execute(sql, tuple(scores))
         except db.OperationalError as OPError:
-            print(OPError)
+            PopWindow('Database Error', OPError)
         except db.ProgrammingError as PROError:
-            print(PROError)
+            PopWindow('Database Error', PROError)
         else:
             connect.commit()
         finally:
             connect.close()
+            PopWindow('Save Successful', 'Your scores were added to the database.')
 
     @staticmethod
     def _set(entry, value):
@@ -166,9 +168,9 @@ class CreateScorecard(ttk.Frame):
                     text = header
             self.score_card.heading(_, text=text)
         self.score_card.grid(row=0, column=0)
-        self.score_card.after(1000, self._load)
+        self.score_card.after(1000, self._reload)
 
-    def _load(self):
+    def _reload(self):
         children = self.score_card.get_children()
         if children:
             for _ in children:
@@ -190,7 +192,7 @@ class CreateScorecard(ttk.Frame):
                 self.score_card.insert('', 'end', values=row)
         finally:
             connect.close()
-            self.score_card.after(300000, self._load)
+            self.score_card.after(150000, self._reload)
 
 
 class EntryHole(ttk.Entry):
@@ -248,11 +250,33 @@ class LabelText(ttk.Label):
 class CreateDGK(ttk.Frame):
 
     def __init__(self, master, database):
-        # Create application window
         ttk.Frame.__init__(self, master)
         self.pack()
         CreateGameForm(self, database)
         CreateScorecard(self, database)
+
+
+class PopWindow(tk.Toplevel):
+
+    def __init__(self, title, message):
+        tk.Toplevel.__init__(self)
+        self.title(title)
+        self['background'] = DEFAULT_WIDGET_BACKGROUND
+        self.attributes('-topmost', True)
+        self.resizable(False, False)
+        msg = tk.Message(self)
+        msg['background'] = DEFAULT_WIDGET_BACKGROUND
+        msg['text'] = message
+        msg['width'] = 575
+        msg.pack(padx=15, pady=(20, 10), fill=tk.BOTH)
+        btn_close = ttk.Button(self)
+        btn_close['command'] = self._close
+        btn_close['text'] = 'Ok'
+        btn_close.pack(pady=(10, 20))
+        self.mainloop()
+
+    def _close(self):
+        self.destroy()
 
 
 def main():
