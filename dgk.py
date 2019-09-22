@@ -28,7 +28,6 @@ class ButtonSave(ttk.Button):
 class CreateGameForm(ttk.Frame):
 
     SIDE_BACK = 0
-    SIDE_BOTH = -1
     SIDE_FRONT = 1
 
     def __init__(self, master, database):
