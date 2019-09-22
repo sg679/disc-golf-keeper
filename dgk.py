@@ -184,9 +184,9 @@ class CreateScorecard(ttk.Frame):
                            'hole17, hole18, back, total FROM game_stats '
                            'ORDER BY GID DESC')
         except db.OperationalError as OPError:
-            exit(OPError)
+            PopWindow('Database Error', OPError)
         except db.ProgrammingError as PROError:
-            exit(PROError)
+            PopWindow('Database Error', PROError)
         else:
             for row in cursor.fetchall():
                 self.score_card.insert('', 'end', values=row)
