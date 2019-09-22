@@ -99,10 +99,10 @@ class CreateGameForm(ttk.Frame):
 
     @staticmethod
     def _set(entry, value):
-        entry.configure(state=tk.NORMAL)
+        entry['state'] = tk.NORMAL
         entry.delete(0, tk.END)
         entry.insert(tk.END, value)
-        entry.configure(state=tk.DISABLED)
+        entry['state'] = tk.DISABLED
 
     def _sub(self, side):
         row = []
@@ -201,8 +201,14 @@ class EntryHole(ttk.Entry):
         self['justify'] = 'center'
         self['width'] = 3
         self.insert(tk.END, 0)
+        self.bind('<FocusIn>', self._reset)
         self.bind('<FocusOut>', callback)
         self.grid(row=index[0], column=index[1])
+
+    def _reset(self, event):
+        print(event)
+        self.delete(0, tk.END)
+        self.insert(tk.END, '')
 
 
 class EntryTotalMain(ttk.Entry):
