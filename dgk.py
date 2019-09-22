@@ -98,11 +98,11 @@ class CreateGameForm(ttk.Frame):
             connect.close()
 
     @staticmethod
-    def _set(master, value):
-        master.configure(state=tk.NORMAL)
-        master.delete(0, tk.END)
-        master.insert(tk.END, value)
-        master.configure(state=tk.DISABLED)
+    def _set(entry, value):
+        entry.configure(state=tk.NORMAL)
+        entry.delete(0, tk.END)
+        entry.insert(tk.END, value)
+        entry.configure(state=tk.DISABLED)
 
     def _sub(self, side):
         row = []
