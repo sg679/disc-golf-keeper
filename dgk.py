@@ -6,7 +6,7 @@ import tkinter as tk
 
 __author__ = 'Marcus T Taylor'
 __email__ = 'taylormjm3121@gmail.com'
-__version__ = '0.1'
+__version__ = '0.2'
 
 DEFAULT_FONT_ENTRY = ('Helvetica', 13)
 DEFAULT_FONT_LABEL = ('Helvetica', 12)
@@ -27,6 +27,10 @@ class ButtonSave(ttk.Button):
 
 class CreateGameForm(ttk.Frame):
 
+    SIDE_BACK = 0
+    SIDE_BOTH = -1
+    SIDE_FRONT = 1
+
     def __init__(self, master, database):
         self.database = database
         ttk.Frame.__init__(self, master)
@@ -37,15 +41,15 @@ class CreateGameForm(ttk.Frame):
             LabelText(self, (0, index), label, DEFAULT_LABEL_WIDTH)
         LabelText(self, (0, 9), 'Front', DEFAULT_LABEL_WIDTH)
         LabelText(self, (0, 10), 'Total', 14)
-        self.hole1 = EntryHole(self, (1, 0), self._update_entry)
-        self.hole2 = EntryHole(self, (1, 1), self._update_entry)
-        self.hole3 = EntryHole(self, (1, 2), self._update_entry)
-        self.hole4 = EntryHole(self, (1, 3), self._update_entry)
-        self.hole5 = EntryHole(self, (1, 4), self._update_entry)
-        self.hole6 = EntryHole(self, (1, 5), self._update_entry)
-        self.hole7 = EntryHole(self, (1, 6), self._update_entry)
-        self.hole8 = EntryHole(self, (1, 7), self._update_entry)
-        self.hole9 = EntryHole(self, (1, 8), self._update_entry)
+        self.hole1 = EntryHole(self, (1, 0), self._update)
+        self.hole2 = EntryHole(self, (1, 1), self._update)
+        self.hole3 = EntryHole(self, (1, 2), self._update)
+        self.hole4 = EntryHole(self, (1, 3), self._update)
+        self.hole5 = EntryHole(self, (1, 4), self._update)
+        self.hole6 = EntryHole(self, (1, 5), self._update)
+        self.hole7 = EntryHole(self, (1, 6), self._update)
+        self.hole8 = EntryHole(self, (1, 7), self._update)
+        self.hole9 = EntryHole(self, (1, 8), self._update)
         self.front = EntryTotalSub(self, (1, 9))
         self.total = EntryTotalMain(self, (1, 10))
         for index in range(10, 19):
@@ -53,20 +57,20 @@ class CreateGameForm(ttk.Frame):
             label = f'{hole}'
             LabelText(self, (2, index - 10), label, DEFAULT_LABEL_WIDTH)
         LabelText(self, (2, 9), 'Back', DEFAULT_LABEL_WIDTH)
-        self.hole10 = EntryHole(self, (3, 0), self._update_entry)
-        self.hole11 = EntryHole(self, (3, 1), self._update_entry)
-        self.hole12 = EntryHole(self, (3, 2), self._update_entry)
-        self.hole13 = EntryHole(self, (3, 3), self._update_entry)
-        self.hole14 = EntryHole(self, (3, 4), self._update_entry)
-        self.hole15 = EntryHole(self, (3, 5), self._update_entry)
-        self.hole16 = EntryHole(self, (3, 6), self._update_entry)
-        self.hole17 = EntryHole(self, (3, 7), self._update_entry)
-        self.hole18 = EntryHole(self, (3, 8), self._update_entry)
+        self.hole10 = EntryHole(self, (3, 0), self._update)
+        self.hole11 = EntryHole(self, (3, 1), self._update)
+        self.hole12 = EntryHole(self, (3, 2), self._update)
+        self.hole13 = EntryHole(self, (3, 3), self._update)
+        self.hole14 = EntryHole(self, (3, 4), self._update)
+        self.hole15 = EntryHole(self, (3, 5), self._update)
+        self.hole16 = EntryHole(self, (3, 6), self._update)
+        self.hole17 = EntryHole(self, (3, 7), self._update)
+        self.hole18 = EntryHole(self, (3, 8), self._update)
         self.back = EntryTotalSub(self, (3, 9))
-        ButtonSave(self, self._save_scores)
-        self.after(500, self._update_entry)
+        ButtonSave(self, self._save)
+        self.after(500, self._update)
 
-    def _save_scores(self):
+    def _save(self):
         connect = db.connect(self.database)
         cursor = connect.cursor()
         sql = 'INSERT INTO game_stats ' \
@@ -78,10 +82,10 @@ class CreateGameForm(ttk.Frame):
         scores = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
                   self.hole4.get(), self.hole5.get(), self.hole6.get(),
                   self.hole7.get(), self.hole8.get(), self.hole9.get(),
-                  self.total_sub('front'), self.hole10.get(), self.hole11.get(),
+                  self._sub(self.SIDE_FRONT), self.hole10.get(), self.hole11.get(),
                   self.hole12.get(), self.hole13.get(), self.hole14.get(),
                   self.hole15.get(), self.hole16.get(), self.hole17.get(),
-                  self.hole18.get(), self.total_sub('back'), self.total_score()]
+                  self.hole18.get(), self._sub(self.SIDE_BACK), self._total()]
         scores = [int(x) for x in scores]
         try:
             cursor.execute(sql, tuple(scores))
@@ -94,34 +98,34 @@ class CreateGameForm(ttk.Frame):
         finally:
             connect.close()
 
-    def _update_entry(self, event=None):
-        print(event)
-        self.set_total(self.front, self.total_sub('front'))
-        self.set_total(self.back, self.total_sub('back'))
-        self.set_total(self.total, self.total_score())
-
     @staticmethod
-    def set_total(master, value):
+    def _set(master, value):
         master.configure(state=tk.NORMAL)
         master.delete(0, tk.END)
         master.insert(tk.END, value)
         master.configure(state=tk.DISABLED)
 
-    def total_score(self):
-        return self.total_sub('back') + self.total_sub('front')
-
-    def total_sub(self, side):
+    def _sub(self, side):
         row = []
-        if side == 'back':
+        if side is self.SIDE_BACK:
             row = [self.hole10.get(), self.hole11.get(), self.hole12.get(),
                    self.hole13.get(), self.hole14.get(), self.hole15.get(),
                    self.hole16.get(), self.hole17.get(), self.hole18.get()]
-        if side == 'front':
+        if side is self.SIDE_FRONT:
             row = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
                    self.hole4.get(), self.hole5.get(), self.hole6.get(),
                    self.hole7.get(), self.hole8.get(), self.hole9.get()]
         row = [int(x) for x in row]
         return sum(row)
+
+    def _total(self):
+        return self._sub(self.SIDE_BACK) + self._sub(self.SIDE_FRONT)
+
+    def _update(self, event=None):
+        print(event)
+        self._set(self.front, self._sub(self.SIDE_FRONT))
+        self._set(self.back, self._sub(self.SIDE_BACK))
+        self._set(self.total, self._total())
 
 
 class CreateScorecard(ttk.Frame):
@@ -131,8 +135,10 @@ class CreateScorecard(ttk.Frame):
         ttk.Frame.__init__(self, master)
         self.grid(row=1, column=0, padx=10, pady=10)
         self.score_card = ttk.Treeview(self)
-        ysb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.score_card.yview)
-        self.score_card.configure(yscroll=ysb.set)
+        ysb = ttk.Scrollbar(self)
+        ysb['command'] = self.score_card.yview
+        ysb['orient'] = tk.VERTICAL
+        self.score_card['yscroll'] = ysb.set
         ysb.grid(row=0, column=1, sticky=tk.NE + tk.SE)
         self.score_card['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9',
                                       '10', '11', '12', '13', '14', '15', '16', '17',
@@ -234,30 +240,36 @@ class LabelText(ttk.Label):
         self.grid(row=index[0], column=index[1])
 
 
-class CreateGui(tk.Tk):
+class CreateDGK(ttk.Frame):
 
-    def __init__(self):
-        # Database checking.
-        data_dir = os.path.abspath(__file__)
-        database = data_dir.replace(os.path.basename(__file__), 'database/dgk.sqlite')
-        try:
-            if not os.path.exists(database):
-                raise FileNotFoundError
-            else:
-                self.database = database
-        except FileNotFoundError:
-            exit('Database file not found! Exiting...')
+    def __init__(self, master, database):
         # Create application window
-        tk.Tk.__init__(self)
-        self.title(f'Disc Golfer Keeper - {gp.getuser()}')
-        self.resizable(False, False)
-        self['background'] = 'gray91'
-        self['bd'] = 1
-        self['relief'] = tk.GROOVE
-        self['takefocus'] = True
-        CreateGameForm(self, self.database)
-        CreateScorecard(self, self.database)
+        ttk.Frame.__init__(self, master)
+        self.pack()
+        CreateGameForm(self, database)
+        CreateScorecard(self, database)
+
+
+def main():
+    # Database checking.
+    data_dir = os.path.abspath(__file__)
+    database = data_dir.replace(os.path.basename(__file__), 'database/dgk.sqlite')
+    try:
+        if not os.path.exists(database):
+            raise FileNotFoundError
+    except FileNotFoundError:
+        exit('Database file not found! Exiting...')
+    # Draw Gui
+    root = tk.Tk()
+    root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
+    root.resizable(False, False)
+    root['background'] = 'gray91'
+    root['bd'] = 1
+    root['relief'] = tk.GROOVE
+    root['takefocus'] = True
+    CreateDGK(root, database)
+    root.mainloop()
 
 
 if __name__ == '__main__':
-    CreateGui().mainloop()
+    main()
