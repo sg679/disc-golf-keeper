@@ -136,6 +136,11 @@ class CreateScorecard(ttk.Frame):
         ttk.Frame.__init__(self, master)
         self.grid(row=1, column=0, padx=10, pady=10)
         self.score_card = ttk.Treeview(self)
+        xsb = ttk.Scrollbar(self)
+        xsb['command'] = self.score_card.xview
+        xsb['orient'] = tk.HORIZONTAL
+        self.score_card['xscroll'] = xsb.set
+        xsb.grid(row=1, column=0, sticky=tk.SW + tk.SE)
         ysb = ttk.Scrollbar(self)
         ysb['command'] = self.score_card.yview
         ysb['orient'] = tk.VERTICAL
@@ -291,7 +296,7 @@ def main():
     # Draw Gui
     root = tk.Tk()
     root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
-    root.resizable(False, False)
+    # root.resizable(False, False)
     root['background'] = 'gray91'
     root['bd'] = 1
     root['relief'] = tk.GROOVE
