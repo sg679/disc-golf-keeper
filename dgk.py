@@ -6,13 +6,14 @@ import tkinter as tk
 
 __author__ = 'Marcus T Taylor'
 __email__ = 'taylormjm3121@gmail.com'
-__version__ = '0.3'
+__version__ = '0.5'
 
-DEFAULT_FONT_ENTRY = ('Helvetica', 13)
-DEFAULT_FONT_LABEL = ('Helvetica', 12)
+DEFAULT_FONT_ENTRY = ('Helvetica', 14)
+DEFAULT_FONT_LABEL = ('Helvetica', 13)
 DEFAULT_LABEL_WIDTH = 7
 DEFAULT_TV_WIDTH_1 = 35
-DEFAULT_TV_WIDTH_2 = 55
+DEFAULT_TV_WIDTH_2 = 60
+DEFAULT_TV_WIDTH_3 = 130
 DEFAULT_WIDGET_BACKGROUND = 'gray91'
 
 
@@ -23,7 +24,16 @@ class ButtonSave(ttk.Button):
         self['command'] = command
         self['text'] = 'Save'
         self['width'] = 10
-        self.grid(row=4, column=0, columnspan=11, pady=(15, 0))
+        self.grid(row=5, column=0, columnspan=11, pady=(15, 0))
+
+
+class CreateDGK(ttk.Frame):
+
+    def __init__(self, master, database):
+        ttk.Frame.__init__(self, master)
+        self.pack()
+        CreateGameForm(self, database)
+        CreateScorecard(self, database)
 
 
 class CreateGameForm(ttk.Frame):
@@ -35,58 +45,87 @@ class CreateGameForm(ttk.Frame):
         self.database = database
         ttk.Frame.__init__(self, master)
         self.grid(row=0, column=0, padx=10, pady=10)
+        table = ttk.Frame(self)
+        table.grid(row=0, column=0, columnspan=11, pady=10)
+        FieldLabel(table, 'Course')
+        self.course = FieldCombo(table, ['Mary Rutan Park', 'Mill Valley Park'])
         for index in range(0, 9):
             hole = index + 1
             label = hole
-            LabelText(self, (0, index), label, DEFAULT_LABEL_WIDTH)
-        LabelText(self, (0, 9), 'Front', DEFAULT_LABEL_WIDTH)
-        LabelText(self, (0, 10), 'Total', 14)
-        self.hole1 = EntryHole(self, (1, 0), self._update)
-        self.hole2 = EntryHole(self, (1, 1), self._update)
-        self.hole3 = EntryHole(self, (1, 2), self._update)
-        self.hole4 = EntryHole(self, (1, 3), self._update)
-        self.hole5 = EntryHole(self, (1, 4), self._update)
-        self.hole6 = EntryHole(self, (1, 5), self._update)
-        self.hole7 = EntryHole(self, (1, 6), self._update)
-        self.hole8 = EntryHole(self, (1, 7), self._update)
-        self.hole9 = EntryHole(self, (1, 8), self._update)
-        self.front = EntryTotalSub(self, (1, 9))
-        self.total = EntryTotalMain(self, (1, 10))
+            LabelText(self, (1, index), label, DEFAULT_LABEL_WIDTH)
+        LabelText(self, (1, 9), 'Front', DEFAULT_LABEL_WIDTH)
+        LabelText(self, (1, 10), 'Total', 14)
+        self.hole1 = EntryHole(self, (2, 0), self._update)
+        self.hole2 = EntryHole(self, (2, 1), self._update)
+        self.hole3 = EntryHole(self, (2, 2), self._update)
+        self.hole4 = EntryHole(self, (2, 3), self._update)
+        self.hole5 = EntryHole(self, (2, 4), self._update)
+        self.hole6 = EntryHole(self, (2, 5), self._update)
+        self.hole7 = EntryHole(self, (2, 6), self._update)
+        self.hole8 = EntryHole(self, (2, 7), self._update)
+        self.hole9 = EntryHole(self, (2, 8), self._update)
+        self.front = EntryTotalSub(self, (2, 9))
+        self.total = EntryTotalMain(self, (2, 10))
         for index in range(10, 19):
             hole = index
-            label = f'{hole}'
-            LabelText(self, (2, index - 10), label, DEFAULT_LABEL_WIDTH)
-        LabelText(self, (2, 9), 'Back', DEFAULT_LABEL_WIDTH)
-        self.hole10 = EntryHole(self, (3, 0), self._update)
-        self.hole11 = EntryHole(self, (3, 1), self._update)
-        self.hole12 = EntryHole(self, (3, 2), self._update)
-        self.hole13 = EntryHole(self, (3, 3), self._update)
-        self.hole14 = EntryHole(self, (3, 4), self._update)
-        self.hole15 = EntryHole(self, (3, 5), self._update)
-        self.hole16 = EntryHole(self, (3, 6), self._update)
-        self.hole17 = EntryHole(self, (3, 7), self._update)
-        self.hole18 = EntryHole(self, (3, 8), self._update)
-        self.back = EntryTotalSub(self, (3, 9))
+            label = '{}'.format(hole)
+            LabelText(self, (3, index - 10), label, DEFAULT_LABEL_WIDTH)
+        LabelText(self, (3, 9), 'Back', DEFAULT_LABEL_WIDTH)
+        self.hole10 = EntryHole(self, (4, 0), self._update)
+        self.hole11 = EntryHole(self, (4, 1), self._update)
+        self.hole12 = EntryHole(self, (4, 2), self._update)
+        self.hole13 = EntryHole(self, (4, 3), self._update)
+        self.hole14 = EntryHole(self, (4, 4), self._update)
+        self.hole15 = EntryHole(self, (4, 5), self._update)
+        self.hole16 = EntryHole(self, (4, 6), self._update)
+        self.hole17 = EntryHole(self, (4, 7), self._update)
+        self.hole18 = EntryHole(self, (4, 8), self._update)
+        self.back = EntryTotalSub(self, (4, 9))
         ButtonSave(self, self._save)
         self.after(500, self._update)
+
+    def _clear(self):
+        self._set(self.hole1, 0)
+        self._set(self.hole2, 0)
+        self._set(self.hole3, 0)
+        self._set(self.hole4, 0)
+        self._set(self.hole5, 0)
+        self._set(self.hole6, 0)
+        self._set(self.hole7, 0)
+        self._set(self.hole8, 0)
+        self._set(self.hole9, 0)
+        self._set(self.front, 0)
+        self._set(self.hole10, 0)
+        self._set(self.hole11, 0)
+        self._set(self.hole12, 0)
+        self._set(self.hole13, 0)
+        self._set(self.hole14, 0)
+        self._set(self.hole15, 0)
+        self._set(self.hole16, 0)
+        self._set(self.hole17, 0)
+        self._set(self.hole18, 0)
+        self._set(self.back, 0)
+        self._set(self.total, 0)
 
     def _save(self):
         connect = db.connect(self.database)
         cursor = connect.cursor()
         sql = 'INSERT INTO game_stats ' \
-              '(hole01, hole02, hole03, hole04, hole05, ' \
-              'hole06, hole07, hole08, hole09, front, ' \
-              'hole10, hole11, hole12, hole13, hole14, ' \
-              'hole15, hole16, hole17, hole18, back, total) ' \
-              'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+              '(hole01, hole02, hole03, hole04, hole05, hole06, ' \
+              'hole07, hole08, hole09, front, hole10, hole11, ' \
+              'hole12, hole13, hole14, hole15, hole16, hole17, ' \
+              'hole18, back, total, course) ' \
+              'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         scores = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
                   self.hole4.get(), self.hole5.get(), self.hole6.get(),
                   self.hole7.get(), self.hole8.get(), self.hole9.get(),
-                  self._sub(self.SIDE_FRONT), self.hole10.get(), self.hole11.get(),
-                  self.hole12.get(), self.hole13.get(), self.hole14.get(),
-                  self.hole15.get(), self.hole16.get(), self.hole17.get(),
-                  self.hole18.get(), self._sub(self.SIDE_BACK), self._total()]
+                  self._sub(self.SIDE_FRONT), self.hole10.get(),
+                  self.hole11.get(), self.hole12.get(), self.hole13.get(),
+                  self.hole14.get(), self.hole15.get(), self.hole16.get(),
+                  self.hole17.get(), self.hole18.get(),
+                  self._sub(self.SIDE_BACK), self._total()]
         scores = [int(x) for x in scores]
+        scores.append(self.course.get())
         try:
             cursor.execute(sql, tuple(scores))
         except db.OperationalError as OPError:
@@ -97,6 +136,7 @@ class CreateGameForm(ttk.Frame):
             connect.commit()
         finally:
             connect.close()
+            self._clear()
             PopWindow('Save Successful', 'Your scores were added to the database.')
 
     @staticmethod
@@ -148,12 +188,14 @@ class CreateScorecard(ttk.Frame):
         ysb.grid(row=0, column=1, sticky=tk.NE + tk.SE)
         self.score_card['columns'] = ('1', '2', '3', '4', '5', '6', '7', '8', '9',
                                       '10', '11', '12', '13', '14', '15', '16', '17',
-                                      '18', '19', '20', '21')
+                                      '18', '19', '20', '21', '22')
         self.score_card['height'] = 10
         self.score_card['selectmode'] = 'browse'
         self.score_card['show'] = 'headings'
         for _ in self.score_card['columns']:
-            if _ in ('10', '20', '21'):
+            if _ in ('22',):
+                width = DEFAULT_TV_WIDTH_3
+            elif _ in ('10', '20', '21'):
                 width = DEFAULT_TV_WIDTH_2
             else:
                 width = DEFAULT_TV_WIDTH_1
@@ -165,6 +207,8 @@ class CreateScorecard(ttk.Frame):
                 text = 'Back'
             elif _ == '21':
                 text = 'Total'
+            elif _ == '22':
+                text = 'Course'
             else:
                 header = int(_)
                 if header > 10:
@@ -186,7 +230,7 @@ class CreateScorecard(ttk.Frame):
             cursor.execute('SELECT hole01, hole02, hole03, hole04, hole05, '
                            'hole06, hole07, hole08, hole09, front, hole10, '
                            'hole11, hole12, hole13, hole14, hole15, hole16, '
-                           'hole17, hole18, back, total FROM game_stats '
+                           'hole17, hole18, back, total, course FROM game_stats '
                            'ORDER BY GID DESC')
         except db.OperationalError as OPError:
             PopWindow('Database Error', OPError)
@@ -241,6 +285,30 @@ class EntryTotalSub(ttk.Entry):
         self.grid(row=index[0], column=index[1])
 
 
+class FieldCombo(ttk.Combobox):
+
+    def __init__(self, master, options):
+        ttk.Combobox.__init__(self, master)
+        self['height'] = 6
+        self['justify'] = 'center'
+        self['state'] = 'readonly'
+        self['value'] = options
+        self['width'] = 20
+        self.set(options[0])
+        self.grid(row=0, column=1)
+
+
+class FieldLabel(ttk.Label):
+
+    def __init__(self, master, text):
+        ttk.Label.__init__(self, master)
+        self['anchor'] = tk.CENTER
+        self['font'] = DEFAULT_FONT_LABEL
+        self['text'] = text
+        self['width'] = 20
+        self.grid(row=0, column=0)
+
+
 class LabelText(ttk.Label):
 
     def __init__(self, master, index, text, width):
@@ -250,15 +318,6 @@ class LabelText(ttk.Label):
         self['text'] = text
         self['width'] = width
         self.grid(row=index[0], column=index[1])
-
-
-class CreateDGK(ttk.Frame):
-
-    def __init__(self, master, database):
-        ttk.Frame.__init__(self, master)
-        self.pack()
-        CreateGameForm(self, database)
-        CreateScorecard(self, database)
 
 
 class PopWindow(tk.Toplevel):
@@ -287,7 +346,7 @@ class PopWindow(tk.Toplevel):
 def main():
     # Database checking.
     data_dir = os.path.abspath(__file__)
-    database = data_dir.replace(os.path.basename(__file__), 'database/dgk.sqlite')
+    database = data_dir.replace(os.path.basename(__file__), 'database/dgk.db')
     try:
         if not os.path.exists(database):
             raise FileNotFoundError
@@ -296,7 +355,6 @@ def main():
     # Draw Gui
     root = tk.Tk()
     root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
-    # root.resizable(False, False)
     root['background'] = 'gray91'
     root['bd'] = 1
     root['relief'] = tk.GROOVE
