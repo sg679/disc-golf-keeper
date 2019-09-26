@@ -322,12 +322,13 @@ class HoleScore(ttk.Entry):
 
 class PopWindow(tk.Toplevel):
 
-    def __init__(self, title, message):
+    def __init__(self, title, message, close_all=False):
         tk.Toplevel.__init__(self)
         self.title(title)
         self['background'] = DEFAULT_WIDGET_BACKGROUND
         self.attributes('-topmost', True)
         self.resizable(False, False)
+        self.close_all = close_all
         msg = tk.Message(self)
         msg['background'] = DEFAULT_WIDGET_BACKGROUND
         msg['text'] = message
@@ -340,7 +341,10 @@ class PopWindow(tk.Toplevel):
         self.mainloop()
 
     def _close(self):
-        self.quit()
+        if not self.close_all:
+            self.destroy()
+        else:
+            self.quit()
 
 
 def main():
@@ -360,7 +364,7 @@ def main():
         CreateDGK(root, database)
         root.mainloop()
     except FileNotFoundError:
-        PopWindow('Startup Error', 'The score database is missing!')
+        PopWindow('Startup Error', 'The score database is missing!', True)
 
 
 if __name__ == '__main__':
