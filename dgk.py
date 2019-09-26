@@ -340,7 +340,7 @@ class PopWindow(tk.Toplevel):
         self.mainloop()
 
     def _close(self):
-        self.destroy()
+        self.quit()
 
 
 def main():
@@ -350,17 +350,17 @@ def main():
     try:
         if not os.path.exists(database):
             raise FileNotFoundError
+        # Draw Gui
+        root = tk.Tk()
+        root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
+        root['background'] = 'gray91'
+        root['bd'] = 1
+        root['relief'] = tk.GROOVE
+        root['takefocus'] = True
+        CreateDGK(root, database)
+        root.mainloop()
     except FileNotFoundError:
-        exit('Database file not found! Exiting...')
-    # Draw Gui
-    root = tk.Tk()
-    root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
-    root['background'] = 'gray91'
-    root['bd'] = 1
-    root['relief'] = tk.GROOVE
-    root['takefocus'] = True
-    CreateDGK(root, database)
-    root.mainloop()
+        PopWindow('Startup Error', 'The score database is missing!')
 
 
 if __name__ == '__main__':
