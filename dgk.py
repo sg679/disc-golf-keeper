@@ -52,34 +52,34 @@ class CreateGameForm(ttk.Frame):
         for index in range(0, 9):
             hole = index + 1
             label = hole
-            LabelText(self, (1, index), label, DEFAULT_LABEL_WIDTH)
-        LabelText(self, (1, 9), 'Front', DEFAULT_LABEL_WIDTH)
-        LabelText(self, (1, 10), 'Total', 14)
-        self.hole1 = EntryHole(self, (2, 0), self._update)
-        self.hole2 = EntryHole(self, (2, 1), self._update)
-        self.hole3 = EntryHole(self, (2, 2), self._update)
-        self.hole4 = EntryHole(self, (2, 3), self._update)
-        self.hole5 = EntryHole(self, (2, 4), self._update)
-        self.hole6 = EntryHole(self, (2, 5), self._update)
-        self.hole7 = EntryHole(self, (2, 6), self._update)
-        self.hole8 = EntryHole(self, (2, 7), self._update)
-        self.hole9 = EntryHole(self, (2, 8), self._update)
+            HoleLabel(self, (1, index), label, DEFAULT_LABEL_WIDTH)
+        HoleLabel(self, (1, 9), 'Front', DEFAULT_LABEL_WIDTH)
+        HoleLabel(self, (1, 10), 'Total', 14)
+        self.hole1 = HoleScore(self, (2, 0), self._update)
+        self.hole2 = HoleScore(self, (2, 1), self._update)
+        self.hole3 = HoleScore(self, (2, 2), self._update)
+        self.hole4 = HoleScore(self, (2, 3), self._update)
+        self.hole5 = HoleScore(self, (2, 4), self._update)
+        self.hole6 = HoleScore(self, (2, 5), self._update)
+        self.hole7 = HoleScore(self, (2, 6), self._update)
+        self.hole8 = HoleScore(self, (2, 7), self._update)
+        self.hole9 = HoleScore(self, (2, 8), self._update)
         self.front = EntryTotalSub(self, (2, 9))
         self.total = EntryTotalMain(self, (2, 10))
         for index in range(10, 19):
             hole = index
             label = '{}'.format(hole)
-            LabelText(self, (3, index - 10), label, DEFAULT_LABEL_WIDTH)
-        LabelText(self, (3, 9), 'Back', DEFAULT_LABEL_WIDTH)
-        self.hole10 = EntryHole(self, (4, 0), self._update)
-        self.hole11 = EntryHole(self, (4, 1), self._update)
-        self.hole12 = EntryHole(self, (4, 2), self._update)
-        self.hole13 = EntryHole(self, (4, 3), self._update)
-        self.hole14 = EntryHole(self, (4, 4), self._update)
-        self.hole15 = EntryHole(self, (4, 5), self._update)
-        self.hole16 = EntryHole(self, (4, 6), self._update)
-        self.hole17 = EntryHole(self, (4, 7), self._update)
-        self.hole18 = EntryHole(self, (4, 8), self._update)
+            HoleLabel(self, (3, index - 10), label, DEFAULT_LABEL_WIDTH)
+        HoleLabel(self, (3, 9), 'Back', DEFAULT_LABEL_WIDTH)
+        self.hole10 = HoleScore(self, (4, 0), self._update)
+        self.hole11 = HoleScore(self, (4, 1), self._update)
+        self.hole12 = HoleScore(self, (4, 2), self._update)
+        self.hole13 = HoleScore(self, (4, 3), self._update)
+        self.hole14 = HoleScore(self, (4, 4), self._update)
+        self.hole15 = HoleScore(self, (4, 5), self._update)
+        self.hole16 = HoleScore(self, (4, 6), self._update)
+        self.hole17 = HoleScore(self, (4, 7), self._update)
+        self.hole18 = HoleScore(self, (4, 8), self._update)
         self.back = EntryTotalSub(self, (4, 9))
         ButtonSave(self, self._save)
         self.after(500, self._update)
@@ -244,24 +244,6 @@ class CreateScorecard(ttk.Frame):
             self.score_card.after(150000, self._reload)
 
 
-class EntryHole(ttk.Entry):
-
-    def __init__(self, master, index, callback):
-        ttk.Entry.__init__(self, master)
-        self['font'] = DEFAULT_FONT_ENTRY
-        self['justify'] = 'center'
-        self['width'] = 3
-        self.insert(tk.END, 0)
-        self.bind('<FocusIn>', self._reset)
-        self.bind('<FocusOut>', callback)
-        self.grid(row=index[0], column=index[1])
-
-    def _reset(self, event):
-        print(event)
-        self.delete(0, tk.END)
-        self.insert(tk.END, '')
-
-
 class EntryTotalMain(ttk.Entry):
 
     def __init__(self, master, index):
@@ -309,7 +291,7 @@ class FieldLabel(ttk.Label):
         self.grid(row=0, column=0)
 
 
-class LabelText(ttk.Label):
+class HoleLabel(ttk.Label):
 
     def __init__(self, master, index, text, width):
         ttk.Label.__init__(self, master)
@@ -318,6 +300,24 @@ class LabelText(ttk.Label):
         self['text'] = text
         self['width'] = width
         self.grid(row=index[0], column=index[1])
+
+
+class HoleScore(ttk.Entry):
+
+    def __init__(self, master, index, callback):
+        ttk.Entry.__init__(self, master)
+        self['font'] = DEFAULT_FONT_ENTRY
+        self['justify'] = 'center'
+        self['width'] = 3
+        self.insert(tk.END, 0)
+        self.bind('<FocusIn>', self._reset)
+        self.bind('<FocusOut>', callback)
+        self.grid(row=index[0], column=index[1])
+
+    def _reset(self, event):
+        print(event)
+        self.delete(0, tk.END)
+        self.insert(tk.END, '')
 
 
 class PopWindow(tk.Toplevel):
