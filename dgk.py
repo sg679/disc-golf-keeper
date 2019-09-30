@@ -6,17 +6,17 @@ import tkinter as tk
 
 __author__ = 'Marcus T Taylor'
 __email__ = 'taylormjm3121@gmail.com'
-__version__ = '0.06'
+__version__ = '0.07'
 
-DEFAULT_APP_DIR = os.path.abspath('') + '/'
-DEFAULT_APP_FONT = ('Helvetica', 14)
-DEFAULT_DIR_COURSES = DEFAULT_APP_DIR + 'config/courses.ini'
-DEFAULT_DIR_DATABASE = DEFAULT_APP_DIR + 'database/dgk.db'
-DEFAULT_LABEL_WIDTH = 7
-DEFAULT_TV_WIDTH_1 = 35
-DEFAULT_TV_WIDTH_2 = 60
-DEFAULT_TV_WIDTH_3 = 130
-DEFAULT_WIDGET_BACKGROUND = 'gray91'
+APP_DIR = os.path.abspath('') + '/'
+APP_COURSES = APP_DIR + 'config/courses.ini'
+APP_DATABASE = APP_DIR + 'database/dgk.db'
+APP_FONT = ('Helvetica', 14)
+LABEL_WIDTH = 8
+TV_COLUMN_WIDTH_1 = 35
+TV_COLUMN_WIDTH_2 = 60
+TV_COLUMN_WIDTH_3 = 130
+WIDGET_BACKGROUND = 'gray91'
 
 
 class ButtonSave(ttk.Button):
@@ -24,7 +24,7 @@ class ButtonSave(ttk.Button):
     def __init__(self, master, command):
         ttk.Button.__init__(self, master)
         self['command'] = command
-        self['text'] = 'Save'
+        self['text'] = 'Save Game'
         self['width'] = 10
         self.grid(row=5, column=0, columnspan=11, pady=(15, 0))
 
@@ -53,8 +53,8 @@ class CreateGameForm(ttk.Frame):
         for index in range(0, 9):
             hole = index + 1
             label = hole
-            HoleLabel(self, (1, index), label, DEFAULT_LABEL_WIDTH)
-        HoleLabel(self, (1, 9), 'Front', DEFAULT_LABEL_WIDTH)
+            HoleLabel(self, (1, index), label, LABEL_WIDTH)
+        HoleLabel(self, (1, 9), 'Front', LABEL_WIDTH)
         HoleLabel(self, (1, 10), 'Total', 14)
         self.hole1 = HoleScore(self, (2, 0), self._update)
         self.hole2 = HoleScore(self, (2, 1), self._update)
@@ -70,8 +70,8 @@ class CreateGameForm(ttk.Frame):
         for index in range(10, 19):
             hole = index
             label = '{}'.format(hole)
-            HoleLabel(self, (3, index - 10), label, DEFAULT_LABEL_WIDTH)
-        HoleLabel(self, (3, 9), 'Back', DEFAULT_LABEL_WIDTH)
+            HoleLabel(self, (3, index - 10), label, LABEL_WIDTH)
+        HoleLabel(self, (3, 9), 'Back', LABEL_WIDTH)
         self.hole10 = HoleScore(self, (4, 0), self._update)
         self.hole11 = HoleScore(self, (4, 1), self._update)
         self.hole12 = HoleScore(self, (4, 2), self._update)
@@ -109,8 +109,8 @@ class CreateGameForm(ttk.Frame):
         self._set(self.total, 0)
 
     @staticmethod
-    def _course():
-        with open(DEFAULT_DIR_COURSES, 'r') as c:
+    def _course() -> list:
+        with open(APP_COURSES, 'r') as c:
             courses = c.read()
             c.close()
         course_list = courses.split('\n')
@@ -118,14 +118,6 @@ class CreateGameForm(ttk.Frame):
         return course_list
 
     def _save(self):
-        connect = db.connect(DEFAULT_DIR_DATABASE)
-        cursor = connect.cursor()
-        sql = 'INSERT INTO game_stats ' \
-              '(hole01, hole02, hole03, hole04, hole05, hole06, ' \
-              'hole07, hole08, hole09, front, hole10, hole11, ' \
-              'hole12, hole13, hole14, hole15, hole16, hole17, ' \
-              'hole18, back, total, course) ' \
-              'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         scores = [self.hole1.get(), self.hole2.get(), self.hole3.get(),
                   self.hole4.get(), self.hole5.get(), self.hole6.get(),
                   self.hole7.get(), self.hole8.get(), self.hole9.get(),
@@ -135,6 +127,18 @@ class CreateGameForm(ttk.Frame):
                   self.hole17.get(), self.hole18.get(),
                   self._sub(self.SIDE_BACK), self._total()]
         scores = [int(x) for x in scores]
+        for score in scores:
+            if score <= 0:
+                PopWindow('Save Error', 'Not all values have been entered.')
+                return
+        connect = db.connect(APP_DATABASE)
+        cursor = connect.cursor()
+        sql = 'INSERT INTO game_stats ' \
+              '(hole01, hole02, hole03, hole04, hole05, hole06, ' \
+              'hole07, hole08, hole09, front, hole10, hole11, ' \
+              'hole12, hole13, hole14, hole15, hole16, hole17, ' \
+              'hole18, back, total, course) ' \
+              'VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         scores.append(self.course.get())
         try:
             cursor.execute(sql, tuple(scores))
@@ -156,7 +160,7 @@ class CreateGameForm(ttk.Frame):
         entry.insert(tk.END, value)
         entry['state'] = tk.DISABLED
 
-    def _sub(self, side):
+    def _sub(self, side) -> int:
         row = []
         if side is self.SIDE_BACK:
             row = [self.hole10.get(), self.hole11.get(), self.hole12.get(),
@@ -169,14 +173,14 @@ class CreateGameForm(ttk.Frame):
         row = [int(x) for x in row]
         return sum(row)
 
-    def _total(self):
+    def _total(self) -> int:
         return self._sub(self.SIDE_BACK) + self._sub(self.SIDE_FRONT)
 
     def _update(self, event=None):
-        print(event)
         self._set(self.front, self._sub(self.SIDE_FRONT))
         self._set(self.back, self._sub(self.SIDE_BACK))
         self._set(self.total, self._total())
+        return event
 
 
 class CreateScorecard(ttk.Frame):
@@ -203,11 +207,11 @@ class CreateScorecard(ttk.Frame):
         self.score_card['show'] = 'headings'
         for _ in self.score_card['columns']:
             if _ in ('22',):
-                width = DEFAULT_TV_WIDTH_3
+                width = TV_COLUMN_WIDTH_3
             elif _ in ('10', '20', '21'):
-                width = DEFAULT_TV_WIDTH_2
+                width = TV_COLUMN_WIDTH_2
             else:
-                width = DEFAULT_TV_WIDTH_1
+                width = TV_COLUMN_WIDTH_1
             self.score_card.column(_, width=width, stretch=tk.NO, anchor=tk.CENTER)
         for _ in self.score_card['columns']:
             if _ == '10':
@@ -229,11 +233,12 @@ class CreateScorecard(ttk.Frame):
         self.score_card.after(1000, self._reload)
 
     def _reload(self):
+        # Depopulate old values from treeview.
         children = self.score_card.get_children()
         if children:
             for _ in children:
                 self.score_card.delete(_)
-        connect = db.connect(DEFAULT_DIR_DATABASE)
+        connect = db.connect(APP_DATABASE)
         cursor = connect.cursor()
         try:
             cursor.execute('SELECT hole01, hole02, hole03, hole04, hole05, '
@@ -246,6 +251,7 @@ class CreateScorecard(ttk.Frame):
         except db.ProgrammingError as PROError:
             PopWindow('Database Error', PROError)
         else:
+            # Repopulate treeview with updated values.
             for row in cursor.fetchall():
                 self.score_card.insert('', 'end', values=row)
         finally:
@@ -268,7 +274,7 @@ class EntryTotalSub(ttk.Entry):
 
     def __init__(self, master, index):
         ttk.Entry.__init__(self, master)
-        self['font'] = DEFAULT_APP_FONT
+        self['font'] = APP_FONT
         self['justify'] = 'center'
         self['state'] = tk.DISABLED
         self['width'] = 3
@@ -294,7 +300,7 @@ class FieldLabel(ttk.Label):
     def __init__(self, master, text):
         ttk.Label.__init__(self, master)
         self['anchor'] = tk.CENTER
-        self['font'] = DEFAULT_APP_FONT
+        self['font'] = APP_FONT
         self['text'] = text
         self['width'] = 20
         self.grid(row=0, column=0)
@@ -305,7 +311,7 @@ class HoleLabel(ttk.Label):
     def __init__(self, master, index, text, width):
         ttk.Label.__init__(self, master)
         self['anchor'] = tk.CENTER
-        self['font'] = DEFAULT_APP_FONT
+        self['font'] = APP_FONT
         self['text'] = text
         self['width'] = width
         self.grid(row=index[0], column=index[1])
@@ -315,7 +321,7 @@ class HoleScore(ttk.Entry):
 
     def __init__(self, master, index, callback):
         ttk.Entry.__init__(self, master)
-        self['font'] = DEFAULT_APP_FONT
+        self['font'] = APP_FONT
         self['justify'] = 'center'
         self['width'] = 3
         self.insert(tk.END, 0)
@@ -324,9 +330,9 @@ class HoleScore(ttk.Entry):
         self.grid(row=index[0], column=index[1])
 
     def _reset(self, event):
-        print(event)
         self.delete(0, tk.END)
         self.insert(tk.END, '')
+        return event
 
 
 class PopWindow(tk.Toplevel):
@@ -334,12 +340,12 @@ class PopWindow(tk.Toplevel):
     def __init__(self, title, message, close_all=False):
         tk.Toplevel.__init__(self)
         self.title(title)
-        self['background'] = DEFAULT_WIDGET_BACKGROUND
+        self['background'] = WIDGET_BACKGROUND
         self.attributes('-topmost', True)
         self.resizable(False, False)
         self.close_all = close_all
         msg = tk.Message(self)
-        msg['background'] = DEFAULT_WIDGET_BACKGROUND
+        msg['background'] = WIDGET_BACKGROUND
         msg['text'] = message
         msg['width'] = 575
         msg.pack(padx=15, pady=(20, 10), fill=tk.BOTH)
@@ -359,12 +365,12 @@ class PopWindow(tk.Toplevel):
 def main():
     try:
         # Required file checking.
-        if not os.path.exists(DEFAULT_DIR_COURSES):
+        if not os.path.exists(APP_COURSES):
             raise FileNotFoundError("Cannot find the specified course list at '{}'"
-                                    .format(DEFAULT_DIR_COURSES))
-        if not os.path.exists(DEFAULT_DIR_DATABASE):
+                                    .format(APP_COURSES))
+        if not os.path.exists(APP_DATABASE):
             raise FileNotFoundError("Cannot find the specified database at '{}'"
-                                    .format(DEFAULT_DIR_DATABASE))
+                                    .format(APP_DATABASE))
         # Everything's good, draw the Gui
         root = tk.Tk()
         root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
