@@ -373,7 +373,7 @@ def main():
                                     .format(APP_DATABASE))
         # Everything's good, draw the Gui
         root = tk.Tk()
-        root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
+        root.title('Disc Golfer Keeper v{} - {}'.format(__version__, gp.getuser()))
         root['background'] = 'gray91'
         root['bd'] = 1
         root['relief'] = tk.GROOVE
