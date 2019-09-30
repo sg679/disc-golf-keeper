@@ -9,10 +9,9 @@ __email__ = 'taylormjm3121@gmail.com'
 __version__ = '0.06'
 
 DEFAULT_APP_DIR = os.path.abspath('') + '/'
+DEFAULT_APP_FONT = ('Helvetica', 14)
 DEFAULT_DIR_COURSES = DEFAULT_APP_DIR + 'config/courses.ini'
-DEFAULT_DIR_DATABASE = DEFAULT_APP_DIR + 'database/dgk.ini'
-DEFAULT_FONT_ENTRY = ('Helvetica', 14)
-DEFAULT_FONT_LABEL = ('Helvetica', 13)
+DEFAULT_DIR_DATABASE = DEFAULT_APP_DIR + 'database/dgk.db'
 DEFAULT_LABEL_WIDTH = 7
 DEFAULT_TV_WIDTH_1 = 35
 DEFAULT_TV_WIDTH_2 = 60
@@ -269,7 +268,7 @@ class EntryTotalSub(ttk.Entry):
 
     def __init__(self, master, index):
         ttk.Entry.__init__(self, master)
-        self['font'] = DEFAULT_FONT_ENTRY
+        self['font'] = DEFAULT_APP_FONT
         self['justify'] = 'center'
         self['state'] = tk.DISABLED
         self['width'] = 3
@@ -295,7 +294,7 @@ class FieldLabel(ttk.Label):
     def __init__(self, master, text):
         ttk.Label.__init__(self, master)
         self['anchor'] = tk.CENTER
-        self['font'] = DEFAULT_FONT_LABEL
+        self['font'] = DEFAULT_APP_FONT
         self['text'] = text
         self['width'] = 20
         self.grid(row=0, column=0)
@@ -306,7 +305,7 @@ class HoleLabel(ttk.Label):
     def __init__(self, master, index, text, width):
         ttk.Label.__init__(self, master)
         self['anchor'] = tk.CENTER
-        self['font'] = DEFAULT_FONT_LABEL
+        self['font'] = DEFAULT_APP_FONT
         self['text'] = text
         self['width'] = width
         self.grid(row=index[0], column=index[1])
@@ -316,7 +315,7 @@ class HoleScore(ttk.Entry):
 
     def __init__(self, master, index, callback):
         ttk.Entry.__init__(self, master)
-        self['font'] = DEFAULT_FONT_ENTRY
+        self['font'] = DEFAULT_APP_FONT
         self['justify'] = 'center'
         self['width'] = 3
         self.insert(tk.END, 0)
