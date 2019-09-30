@@ -1,3 +1,3 @@
 # DISC GOLFER KEEPER
 
-Just a GUI tool to track my disc golf games.
+Just a simple GUI application I use to track my disc golf games.
