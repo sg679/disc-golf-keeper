@@ -6,8 +6,11 @@ import tkinter as tk
 
 __author__ = 'Marcus T Taylor'
 __email__ = 'taylormjm3121@gmail.com'
-__version__ = '0.5'
+__version__ = '0.06'
 
+DEFAULT_APP_DIR = os.path.abspath('') + '/'
+DEFAULT_DIR_COURSES = DEFAULT_APP_DIR + 'config/courses.ini'
+DEFAULT_DIR_DATABASE = DEFAULT_APP_DIR + 'database/dgk.ini'
 DEFAULT_FONT_ENTRY = ('Helvetica', 14)
 DEFAULT_FONT_LABEL = ('Helvetica', 13)
 DEFAULT_LABEL_WIDTH = 7
@@ -29,11 +32,11 @@ class ButtonSave(ttk.Button):
 
 class CreateDGK(ttk.Frame):
 
-    def __init__(self, master, database):
+    def __init__(self, master):
         ttk.Frame.__init__(self, master)
         self.pack()
-        CreateGameForm(self, database)
-        CreateScorecard(self, database)
+        CreateGameForm(self)
+        CreateScorecard(self)
 
 
 class CreateGameForm(ttk.Frame):
@@ -41,14 +44,13 @@ class CreateGameForm(ttk.Frame):
     SIDE_BACK = 0
     SIDE_FRONT = 1
 
-    def __init__(self, master, database):
-        self.database = database
+    def __init__(self, master):
         ttk.Frame.__init__(self, master)
         self.grid(row=0, column=0, padx=10, pady=10)
         table = ttk.Frame(self)
         table.grid(row=0, column=0, columnspan=11, pady=10)
         FieldLabel(table, 'Course')
-        self.course = FieldCombo(table, ['Mary Rutan Park', 'Mill Valley Park'])
+        self.course = FieldCombo(table, self._course())
         for index in range(0, 9):
             hole = index + 1
             label = hole
@@ -107,8 +109,17 @@ class CreateGameForm(ttk.Frame):
         self._set(self.back, 0)
         self._set(self.total, 0)
 
+    @staticmethod
+    def _course():
+        with open(DEFAULT_DIR_COURSES, 'r') as c:
+            courses = c.read()
+            c.close()
+        course_list = courses.split('\n')
+        course_list.remove('')
+        return course_list
+
     def _save(self):
-        connect = db.connect(self.database)
+        connect = db.connect(DEFAULT_DIR_DATABASE)
         cursor = connect.cursor()
         sql = 'INSERT INTO game_stats ' \
               '(hole01, hole02, hole03, hole04, hole05, hole06, ' \
@@ -171,8 +182,7 @@ class CreateGameForm(ttk.Frame):
 
 class CreateScorecard(ttk.Frame):
 
-    def __init__(self, master, database):
-        self.database = database
+    def __init__(self, master):
         ttk.Frame.__init__(self, master)
         self.grid(row=1, column=0, padx=10, pady=10)
         self.score_card = ttk.Treeview(self)
@@ -224,7 +234,7 @@ class CreateScorecard(ttk.Frame):
         if children:
             for _ in children:
                 self.score_card.delete(_)
-        connect = db.connect(self.database)
+        connect = db.connect(DEFAULT_DIR_DATABASE)
         cursor = connect.cursor()
         try:
             cursor.execute('SELECT hole01, hole02, hole03, hole04, hole05, '
@@ -348,23 +358,25 @@ class PopWindow(tk.Toplevel):
 
 
 def main():
-    # Database checking.
-    data_dir = os.path.abspath(__file__)
-    database = data_dir.replace(os.path.basename(__file__), 'database/dgk.db')
     try:
-        if not os.path.exists(database):
-            raise FileNotFoundError
-        # Draw Gui
+        # Required file checking.
+        if not os.path.exists(DEFAULT_DIR_COURSES):
+            raise FileNotFoundError("Cannot find the specified course list at '{}'"
+                                    .format(DEFAULT_DIR_COURSES))
+        if not os.path.exists(DEFAULT_DIR_DATABASE):
+            raise FileNotFoundError("Cannot find the specified database at '{}'"
+                                    .format(DEFAULT_DIR_DATABASE))
+        # Everything's good, draw the Gui
         root = tk.Tk()
         root.title('Disc Golfer Keeper - {}'.format(gp.getuser()))
         root['background'] = 'gray91'
         root['bd'] = 1
         root['relief'] = tk.GROOVE
         root['takefocus'] = True
-        CreateDGK(root, database)
+        CreateDGK(root)
         root.mainloop()
-    except FileNotFoundError:
-        PopWindow('Startup Error', 'The score database is missing!', True)
+    except FileNotFoundError as err:
+        PopWindow('Startup Error', err, True)
 
 
 if __name__ == '__main__':
