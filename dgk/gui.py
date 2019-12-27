@@ -6,11 +6,10 @@ import getpass as gp
 import sqlite3 as db
 
 
-DEFAULT_FONT = "Helvetica Neue"
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_COURSES = os.path.join(APP_DIR, "config/courses.ini")
 APP_DATABASE = os.path.join(APP_DIR, "database/dgk.db")
-APP_FONT = ("Helvetica", 14)
+APP_FONT = "Helvetica Neue"
 LABEL_WIDTH = 8
 TV_COLUMN_WIDTH_1 = 35
 TV_COLUMN_WIDTH_2 = 60
@@ -39,7 +38,7 @@ class DGKApplication(tk.Tk):
         self.title("Disc Golfer Keeper v{} - {}".format(__version__, gp.getuser()))
         self.resizable(False, False)
         form_font = font.nametofont("TkDefaultFont")
-        form_font.configure(family=DEFAULT_FONT, size=13)
+        form_font.configure(family=APP_FONT, size=13)
         self.option_add("*Font", form_font)
         self["background"] = WIDGET_BACKGROUND
         self["bd"] = 1
@@ -61,7 +60,7 @@ class DGKButton(ttk.Button):
 
 class DGKCombo(ttk.Combobox):
     def __init__(self, master, options):
-        ttk.Combobox.__init__(self, master)
+        super().__init__(master)
         self["height"] = 6
         self["justify"] = "center"
         self["state"] = "readonly"
@@ -73,9 +72,8 @@ class DGKCombo(ttk.Combobox):
 
 class DGKField(ttk.Label):
     def __init__(self, master, text):
-        ttk.Label.__init__(self, master)
+        super().__init__(master)
         self["anchor"] = tk.CENTER
-        self["font"] = APP_FONT
         self["text"] = text
         self["width"] = 20
         self.grid(row=0, column=0)
@@ -260,9 +258,8 @@ class DGKForm(ttk.Frame):
 
 class DGKHole(ttk.Label):
     def __init__(self, master, index, text, width):
-        ttk.Label.__init__(self, master)
+        super().__init__(master)
         self["anchor"] = tk.CENTER
-        self["font"] = APP_FONT
         self["text"] = text
         self["width"] = width
         self.grid(row=index[0], column=index[1])
@@ -275,8 +272,7 @@ class DGKInfoWindow:
 
 class DGKSub(ttk.Entry):
     def __init__(self, master, index):
-        ttk.Entry.__init__(self, master)
-        self["font"] = APP_FONT
+        super().__init__(master)
         self["justify"] = "center"
         self["state"] = tk.DISABLED
         self["width"] = 3
@@ -286,7 +282,7 @@ class DGKSub(ttk.Entry):
 
 class DGKTotal(ttk.Entry):
     def __init__(self, master, index):
-        ttk.Entry.__init__(self, master)
+        super().__init__(master)
         self["font"] = ("Helvetica", 52)
         self["justify"] = "center"
         self["state"] = tk.DISABLED
@@ -296,8 +292,7 @@ class DGKTotal(ttk.Entry):
 
 class DGKScore(ttk.Entry):
     def __init__(self, master, index, callback):
-        ttk.Entry.__init__(self, master)
-        self["font"] = APP_FONT
+        super().__init__(master)
         self["justify"] = "center"
         self["width"] = 3
         self.insert(tk.END, 0)
