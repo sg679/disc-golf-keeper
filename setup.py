@@ -7,7 +7,7 @@ setup(
     version="0.08.1",
     packages=find_packages(),
     package_data={"dgk": ["config/*.ini", "database/*.db"]},
-    url="https://github.com/mtaylor33/personaednd",
+    url="https://github.com/mtaylor33/disc-golf-keeper",
     license="MIT",
     author="Marcus T Taylor",
     description="A simple graphical application to track your disc golf games.",
